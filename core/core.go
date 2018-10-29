@@ -63,6 +63,31 @@ func (b *Core) Post(path string, object interface{}, ret interface{}) error {
 	return nil
 }
 
+//post form
+func (b *Core) PostForm(path string, form url.Values, ret interface{}) error {
+	tkn, err := b.GetAccessToken()
+	if err != nil {
+		return err
+	}
+
+	u := b.URL(path)
+	q := u.Query()
+	q.Set("access_token", tkn)
+	u.RawQuery = q.Encode()
+	resp, err := http.Post(u.String(),
+		"application/x-www-form-urlencoded", strings.NewReader(form.Encode()))
+
+	if err != nil {
+		return err
+	}
+	err = json.NewDecoder(resp.Body).Decode(ret)
+	if err != nil {
+		logrus.Errorf("decode body to %T failed, %s", ret, err)
+		return err
+	}
+	return nil
+}
+
 type BaiduResponse struct {
 	ErrorCode int    `json:"error_code"`
 	ErrorMsg  string `json:"error_msg"`

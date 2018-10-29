@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package funxdata.baidu;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+
+option go_package = "pb";
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.sizer_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.messagename_all) = false;
+option (gogoproto.goproto_unkeyed_all) = false;
+option (gogoproto.goproto_sizecache_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+
+service BodyTrack {
+    rpc Track(TrackOption) returns (TrackResult) {}
+}
+//人体检测参数
+message TrackOption {
+    int64 caseId = 1[(gogoproto.jsontag) = "case_id"];
+    bool caseInit = 2[(gogoproto.jsontag) = "case_init"];
+    string image = 3;
+    bool dynamic = 4;
+}
+//人体位置
+message Location  {
+	int32 left = 1; 
+	int32 top = 2;
+	int32 width = 3;
+	int32 height = 4;
+}
+//人体信息
+message Info  {
+	Location location = 1; 
+	int32 id       = 2[(gogoproto.jsontag) = "ID"]; 
+}
+//人体数量
+message Count  {
+	int32 in = 1;
+	int32 out = 2;
+}
+//人体检测结果
+message TrackResult {
+	int32 personNum = 1[(gogoproto.jsontag) = "person_num"];
+	repeated Info personInfo = 2[(gogoproto.jsontag) = "person_info"]; 
+	Count personCount = 3[(gogoproto.jsontag) = "person_count"];
+	string image = 4;
+}

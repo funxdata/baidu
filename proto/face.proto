@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package funxdata.baidu;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+
+option go_package = "pb";
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.messagename_all) = false;
+option (gogoproto.goproto_unkeyed_all) = false;
+option (gogoproto.goproto_sizecache_all) = false;
+option (gogoproto.goproto_unrecognized_all) = false;
+
+//人脸搜索参数
+message SearchOption {
+	//图片信息
+	string image = 1;
+	//图片类型
+	string imageType= 2[(gogoproto.jsontag) = "image_type"];
+	//指定用户组
+	string groupIdList = 3[(gogoproto.jsontag) = "group_id_list"];
+	//图片质量
+	string qualityControl =4[(gogoproto.jsontag) = "quality_control"];
+	//活体检测
+	bool livenessControl =5[(gogoproto.jsontag) = "liveness_control"];
+	//对比用户
+	string userId =6[(gogoproto.jsontag) = "user_id"];
+	//最近似用户
+	int32 maxUserNum =7[(gogoproto.jsontag) = "max_user_num"];
+}
+//人脸搜索结果
+message SearchResult  {
+	//人脸标志
+	string faceToken =1[(gogoproto.jsontag) = "face_token"];
+	//匹配的用户信息列表
+	repeated BaiduFaceUser userList=2[(gogoproto.jsontag) = "user_list"];
+
+}
+message BaiduFaceUser  {
+	//用户所属的group_id
+	string groupId =1[(gogoproto.jsontag) = "group_id"];
+	//用户的user_id
+	string userId =2[(gogoproto.jsontag) = "user_id"];
+	//注册用户时携带的user_info
+	string userInfo =3[(gogoproto.jsontag) = "user_info"];
+	//用户的匹配得分，推荐阈值80分
+	double score= 4;
+}
+message DetectOption {
+	//图片信息
+	string image = 1;
+	//图片类型
+	string imageType= 2[(gogoproto.jsontag) = "image_type"];
+	//包括age,beauty,expression,face_shape,gender,glasses,landmark,race,quality,face_type信息
+	string faceField = 3[(gogoproto.jsontag) = "face_field"];
+	//最多处理人脸的数目
+	string maxFaceNum =4[(gogoproto.jsontag) = "max_face_num"];
+	//人脸的类型
+	bool faceType =5[(gogoproto.jsontag) = "face_type"];
+}
+message DetectResult {
+	int32 faceNum= 1[(gogoproto.jsontag) = "face_num"];
+	repeated FaceInfo faceList= 2[(gogoproto.jsontag) = "face_list"];
+}
+message FaceInfo{
+	string faceToken =1[(gogoproto.jsontag) = "face_token"];
+	int32 age =2;
+	Angle angle =3;
+	double beauty =4;
+	double faceProbability =5;
+	InfoType faceShape =6;
+    InfoType faceType =7;
+    InfoType gender =8;
+    InfoType glasses =9;
+	InfoType expression =10;
+	repeated Point Landmark =11;
+	repeated Point Landmark72 =12;
+	FaceLocation location =13;
+}
+message InfoType {
+	double probability= 1;
+	string type= 2;
+}
+message Point  {
+	double x= 1;
+	double y= 2;
+}
+//人脸旋转角度参数
+message Angle {
+	//三维旋转之左右旋转角[-90(左), 90(右)]
+	double pitch =1;
+	//三维旋转之俯仰角度[-90(上), 90(下)]
+	double roll  =2;
+	//平面内旋转角[-180(逆时针), 180(顺时针)]
+	double yaw   =3;
+}
+//人脸在图片中的位置
+message FaceLocation  {
+	int32 left = 1; 
+	int32 top = 2;
+	int32 width = 3;
+	int32 height = 4;
+	int32 rotation = 5;
+}
+
+service Face{
+	rpc Search(SearchOption) returns(SearchResult){}
+	rpc Detect(DetectOption) returns(DetectResult){}
+}

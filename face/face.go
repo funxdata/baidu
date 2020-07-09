@@ -141,7 +141,7 @@ func (b *BaiduFace) Detect(imgurl string) (*DetectResult, error) {
 	}
 	err := b.Post(urlFaceDetect, req, &ret)
 	if err != nil {
-		logrus.Errorf("detect face %s failed, %s", err)
+		logrus.Errorf("detect face %s failed, %s", imgurl, err)
 		return nil, err
 	}
 

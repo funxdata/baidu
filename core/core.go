@@ -21,19 +21,25 @@ type Core struct {
 }
 
 // NewBaidu
-func NewCore(apiKey, apiSecret string) *Core {
+func NewCore(apiKey, apiSecret string, baseURL ...string) *Core {
 	b := &Core{
 		ApiKey:    apiKey,
 		ApiSecret: apiSecret,
 	}
-	b.baseURL, _ = url.Parse("https://aip.baidubce.com/")
+	if len(baseURL) == 1 && baseURL[0] != "" {
+		b.baseURL, _ = url.Parse(baseURL[0])
+	} else {
+		b.baseURL, _ = url.Parse("https://aip.baidubce.com/")
+	}
 	return b
 }
 
 // URL
 func (b *Core) URL(path string) *url.URL {
 	u, _ := url.Parse(b.baseURL.String())
-	u.Path = path
+	if path != "" {
+		u.Path = path
+	}
 	return u
 }
 
@@ -49,11 +55,42 @@ func (b *Core) Post(path string, object interface{}, ret interface{}) error {
 	u := b.URL(path)
 	q := u.Query()
 	q.Set("access_token", tkn)
+	q.Set("charset", "UTF-8")
 	u.RawQuery = q.Encode()
-	resp, err := http.Post(u.String(), "application/json", buf)
+
+	req, err := http.NewRequest("POST", u.String(), buf)
 	if err != nil {
 		return err
 	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	return b.Do(req, ret)
+	// resp, err := http.Post(u.String(), "application/json", buf)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// // bs, _ := ioutil.ReadAll(resp.Body)
+	// // logrus.Infof("body: %s", bs)
+
+	// err = json.NewDecoder(resp.Body).Decode(ret)
+	// if err != nil {
+	// 	logrus.Errorf("decode body to %T failed, %s", ret, err)
+	// 	return err
+	// }
+	// return nil
+}
+
+// Do .
+func (b *Core) Do(req *http.Request, ret interface{}) error {
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	// bs, _ := ioutil.ReadAll(resp.Body)
+	// logrus.Infof("body: %s", bs)
 
 	err = json.NewDecoder(resp.Body).Decode(ret)
 	if err != nil {
@@ -73,6 +110,7 @@ func (b *Core) PostForm(path string, form url.Values, ret interface{}) error {
 	u := b.URL(path)
 	q := u.Query()
 	q.Set("access_token", tkn)
+	q.Set("charset", "UTF-8")
 	u.RawQuery = q.Encode()
 	resp, err := http.Post(u.String(),
 		"application/x-www-form-urlencoded", strings.NewReader(form.Encode()))

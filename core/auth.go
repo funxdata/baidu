@@ -3,12 +3,13 @@ package core
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/sirupsen/logrus"
 )
 
 const (
-	urlAuth = "/oauth/2.0/token"
+	urlAuth = "https://aip.baidubce.com/oauth/2.0/token"
 )
 
 type AccessToken struct {
@@ -25,7 +26,7 @@ func (b *Core) GetAccessToken() (string, error) {
 	if b.tkn != nil {
 		return b.tkn.AccessToken, nil
 	}
-	u := b.URL(urlAuth)
+	u, _ := url.Parse(urlAuth)
 	q := u.Query()
 	q.Set("grant_type", "client_credentials")
 	q.Set("client_id", b.ApiKey)

@@ -3,6 +3,8 @@ package baidu
 import (
 	"github.com/funxdata/baidu/core"
 	"github.com/funxdata/baidu/face"
+	"github.com/funxdata/baidu/nlp"
+	"github.com/funxdata/baidu/speech"
 )
 
 type Baidu struct {
@@ -16,4 +18,14 @@ func New(apiKey, apiSecret string) *Baidu {
 // Face
 func (b *Baidu) Face() *face.BaiduFace {
 	return &face.BaiduFace{b.Core}
+}
+
+// Face
+func (b *Baidu) Speech() *speech.BaiduSpeech {
+	return &speech.BaiduSpeech{b.Core}
+}
+
+// Face
+func (b *Baidu) NLP() *nlp.BaiduNLP {
+	return &nlp.BaiduNLP{b.Core}
 }

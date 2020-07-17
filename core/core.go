@@ -12,7 +12,7 @@ import (
 )
 
 type Core struct {
-	AppId     string
+	// AppId     string `json:"app_id" yaml:"app_id"`
 	ApiKey    string
 	ApiSecret string
 
@@ -114,10 +114,12 @@ func (b *Core) PostForm(path string, form url.Values, ret interface{}) error {
 	u.RawQuery = q.Encode()
 	resp, err := http.Post(u.String(),
 		"application/x-www-form-urlencoded", strings.NewReader(form.Encode()))
-
 	if err != nil {
 		return err
 	}
+
+	// bs, _ := ioutil.ReadAll(resp.Body)
+	// logrus.Infof("body: %s", bs)
 	err = json.NewDecoder(resp.Body).Decode(ret)
 	if err != nil {
 		logrus.Errorf("decode body to %T failed, %s", ret, err)
